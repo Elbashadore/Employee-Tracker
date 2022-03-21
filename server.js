@@ -50,6 +50,61 @@ const role = [
     }
 ]
 
+// questions for adding an employee
+
+const aEmployee = [
+    {
+        type:'input',
+        name:'firstName',
+        message:"Enter the employee's first name:"
+    },
+    {
+        type:'input',
+        name:'lastName',
+        message:"Enter the employee's last name:"
+    },
+    {
+        type:'input',
+        name:'roleId',
+        message:"Enter the employee's role id:"
+    },
+    {
+        type:'input',
+        name:'managerId',
+        message:"Enter the employee's manager id:"
+    }
+]
+
+// questions for updating an employee
+
+const uEmployee = [
+    {
+        type:'input',
+        name:'firstName',
+        message:"Enter the employee's first name:"
+    },
+    {
+        type:'input',
+        name:'lastName',
+        message:"Enter the employee's last name:"
+    },
+    {
+        type:'input',
+        name:'roleId',
+        message:"Enter the employee's role id:"
+    },
+    {
+        type:'input',
+        name:'managerId',
+        message:"Enter the employee's manager id:"
+    },
+    {
+        type:'input',
+        name:'employeeId',
+        message:"Enter the id of the employee you want to update:"
+    }
+]
+
 
 
 const db = mysql.createConnection(
@@ -86,8 +141,10 @@ function init() {
                 addRole();
                 break;
             case 'Add an employee':
+                addEmployee();
                 break;
             case 'Update an employee role':
+                updateEmployee();
                 break;
         }
 
@@ -143,11 +200,25 @@ function addRole(){
     })
 };
 
-
 // function to add an employee
 
+function addEmployee(){
+    inquirer.prompt(aEmployee).then((answers)=>{
+        const {firstName,lastName,roleId,managerId} = answers
+        db.query(`INSERT INTO employee (first_name,last_name,role_id,manager_id) VALUES ('${firstName}','${lastName}','${roleId}','${managerId}');`)
+        init();
+    })
+};
 
 // function to update an employee role
+
+function updateEmployee(){
+    inquirer.prompt(uEmployee).then((answers)=>{
+        const {firstName,lastName,roleId,managerId,employeeId} = answers
+        db.query(`UPDATE employee set first_name ='${firstName}', last_name = '${lastName}', role_id = '${roleId}',manager_id = '${managerId}' WHERE id = ${employeeId} `)
+        init();
+    })
+}
 
 
 
