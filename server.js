@@ -2,6 +2,7 @@ const inquirer = require('inquirer');
 const mysql = require('mysql2');
 require('dotenv').config();
 const express = require('express');
+const cTable = require('console.table');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -10,7 +11,7 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-
+// questions for starting the app
 const startApp = [
     {
         type: 'list',
@@ -19,6 +20,35 @@ const startApp = [
         choices: ['View all departments', 'View all roles', 'View all employees','Add a department','Add a role','Add an employee','Update an employee role']
     }
 ];
+
+// questions for adding a department name
+const department = [
+    {
+        type:'input',
+        name: 'department',
+        message: 'Enter the department name:'
+    }
+];
+
+// questions for adding a role
+
+const role = [
+    {
+        type:'input',
+        name:'roleName',
+        message: "Enter the role's name:"
+    },
+    {
+        type:'input',
+        name:'salary',
+        message:"Enter the role's salary:"
+    },
+    {
+        type:'input',
+        name:'departmentId',
+        message:"Enter the role's department ID:"
+    }
+]
 
 
 
@@ -31,7 +61,7 @@ const db = mysql.createConnection(
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME
     },
-    console.log(`Connected to the courses_db database.`)
+    console.log(`Connected to the employee_db database.`)
   );
 
 
@@ -50,8 +80,10 @@ function init() {
                 viewallEmployees();
                 break;
             case 'Add a department':
+                addDepartment();
                 break;
             case 'Add a role':
+                addRole();
                 break;
             case 'Add an employee':
                 break;
@@ -60,7 +92,7 @@ function init() {
         }
 
     })
-}
+};
 
 
 
@@ -68,30 +100,48 @@ function init() {
 
 function viewallDepartments(){
     db.query('SELECT * FROM department', function (err, results) {
-        console.log(results);
+        console.table(results);
+        init();
       });
-}
+};
 
 // Function to view all roles
 
 function viewallRoles(){
     db.query('SELECT * FROM role', function (err, results) {
-        console.log(results);
+        console.table(results);
+        init();
       });
-}
+};
 
 // Function to view all employees
 
 function viewallEmployees(){
     db.query('SELECT * FROM employee', function (err, results) {
-        console.log(results);
+        console.table(results);
+        init();
       });
-}
+};
 
 // function to add a department
 
+function addDepartment(){
+    inquirer.prompt(department).then((answers)=>{
+        const {department} = answers
+        db.query(`INSERT INTO department (name) VALUES ('${department}');`)
+        init();
+    })
+};
 
 //function to add a role
+
+function addRole(){
+    inquirer.prompt(role).then((answers)=>{
+        const {departmentId,salary,roleName} = answers
+        db.query(`INSERT INTO role (title,salary,department_id) VALUES ('${roleName}','${salary}','${departmentId}');`)
+        init();
+    })
+};
 
 
 // function to add an employee
